@@ -1,0 +1,1 @@
+"""FirmGen hackathon evaluation service."""

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in | FirmGen Evaluator</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="login-body">
+  <div class="ambient ambient-one"></div>
+  <div class="login-card">
+    <span class="brand-mark large">FG</span>
+    <p class="eyebrow">Organizer access</p>
+    <h1>FirmGen Evaluation Console</h1>
+    <p>Enter the private dashboard password configured by your organizer.</p>
+    {% if error %}<div class="form-error">{{ error }}</div>{% endif %}
+    <form action="/login" method="post">
+      <label for="password">Access password</label>
+      <input id="password" name="password" type="password" required autofocus>
+      <button class="button primary full" type="submit">Open console</button>
+    </form>
+  </div>
+</body>
+</html>

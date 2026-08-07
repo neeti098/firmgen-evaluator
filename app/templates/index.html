@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FirmGen Evaluation Console</title>
+  <meta name="description" content="Evidence-based evaluation for firmware hackathon submissions.">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="FirmGen evaluator home">
+      <span class="brand-mark">FG</span>
+      <span>
+        <strong>Evaluation Console</strong>
+        <small>FirmGen firmware evaluation</small>
+      </span>
+    </a>
+    <div class="top-actions">
+      <span class="model-pill">Up to {{ worker_count }} concurrent evaluations</span>
+      <a class="button secondary compact" href="/api/export.xlsx">Export results</a>
+      <form action="/logout" method="post"><button class="text-button" type="submit">Sign out</button></form>
+    </div>
+  </header>
+
+  <main class="shell">
+    {% if mock_mode %}
+    <div class="mock-banner"><strong>Pipeline test mode:</strong> scores are placeholders until MOCK_OPENAI=false and OPENAI_API_KEY is configured.</div>
+    {% endif %}
+
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Live submission scoring</p>
+        <h1>Evidence in. Scores out.<br><span>Fast, consistent evaluation.</span></h1>
+        <p class="hero-copy">Upload each response batch as it arrives. Repositories are frozen to a commit, README evidence is inspected, and scores appear as evaluations complete.</p>
+      </div>
+      <div class="live-indicator"><span></span>Queue online</div>
+    </section>
+
+    <section class="stats" aria-label="Evaluation overview">
+      <article class="stat-card"><span>Total submissions</span><strong id="stat-total">0</strong><small id="stat-total-note">Ready for the first batch</small></article>
+      <article class="stat-card"><span>In progress</span><strong id="stat-active">0</strong><small>Queued and evaluating</small></article>
+      <article class="stat-card accent"><span>Completed</span><strong id="stat-completed">0</strong><small id="stat-average">Average score -</small></article>
+      <article class="stat-card"><span>Evidence flags</span><strong id="stat-review">0</strong><small>Scores are always produced</small></article>
+    </section>
+
+    <section class="intake-grid">
+      <article class="panel upload-panel">
+        <div class="panel-heading">
+          <div><p class="eyebrow">Batch intake</p><h2>Add spreadsheet responses</h2></div>
+          <span class="step-number">01</span>
+        </div>
+        <label id="drop-zone" class="drop-zone" for="sheet-file">
+          <input id="sheet-file" type="file" accept=".xlsx,.csv" hidden>
+          <span class="upload-icon">Upload</span>
+          <strong>Drop an Excel or CSV file here</strong>
+          <small>Required column: GitHub repository URL. Existing submissions are skipped.</small>
+          <span class="button primary">Choose spreadsheet</span>
+        </label>
+        <div id="upload-progress" class="upload-progress" hidden><span></span><p>Reading submissions...</p></div>
+      </article>
+
+      <article class="panel single-panel">
+        <div class="panel-heading">
+          <div><p class="eyebrow">Quick test</p><h2>Evaluate one repository</h2></div>
+          <span class="step-number">02</span>
+        </div>
+        <form id="repo-form">
+          <label for="team-id">Team or project ID <span>optional</span></label>
+          <input id="team-id" name="team_id" placeholder="e.g. Team 17">
+          <label for="repo-url">Public GitHub repository</label>
+          <input id="repo-url" name="repo_url" type="url" required placeholder="https://github.com/owner/repository">
+          <button class="button primary full" type="submit">Queue evaluation</button>
+        </form>
+        <p class="privacy-note">The OpenAI key remains server-side. Repository content is treated as untrusted evidence.</p>
+      </article>
+    </section>
+
+    <section class="panel results-panel">
+      <div class="results-heading">
+        <div><p class="eyebrow">Incremental results</p><h2>Submission ledger</h2></div>
+        <div class="result-actions">
+          <span id="last-updated">Waiting for data</span>
+          <button id="refresh-button" class="button secondary compact" type="button">Refresh</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Submission</th><th>Status</th><th>Commit</th><th>Score</th><th>Confidence</th><th>Evidence</th><th></th></tr></thead>
+          <tbody id="jobs-body">
+            <tr class="empty-row"><td colspan="7">Upload a response sheet or add a repository to begin.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="detail-dialog">
+    <button id="dialog-close" class="dialog-close" aria-label="Close details">Close</button>
+    <div id="dialog-content"></div>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

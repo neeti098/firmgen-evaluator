@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: firmgen-evaluator
+    runtime: docker
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: APP_PASSWORD
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DATA_DIR
+        value: /data
+    disk:
+      name: evaluator-data
+      mountPath: /data
+      sizeGB: 1

@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+data/
+tmp/
+*.db
+*.sqlite3
+*.xlsx
+!submission_template.xlsx
